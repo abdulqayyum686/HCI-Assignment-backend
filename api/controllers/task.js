@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const Task = require("../models/tasks");
-// remove c
+
 module.exports.addMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
-  const { taskName, belongsTo, taskType, status } = req.body;
+  const { taskName, belongsTo, taskType, status, version } = req.body;
 
   Task.findOne({ taskName: taskName })
     .exec()
@@ -17,6 +17,7 @@ module.exports.addMainTask = async (req, res, next) => {
           taskName,
           belongsTo,
           taskType,
+          version,
         });
         newTask
           .save()
@@ -130,5 +131,18 @@ module.exports.deleteSubTask = async (req, res, next) => {
   } catch (err) {
     console.log("Error deleting sub task:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports.getAllTasks = async (req, res, next) => {
+  try {
+    let tasks = await Task.find().populate("belongsTo");
+    return res.status(201).json({
+      tasks,
+    });
+  } catch (error) {
+    return res.status(201).json({
+      error,
+    });
   }
 };

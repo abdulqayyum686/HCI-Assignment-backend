@@ -25,7 +25,7 @@ function taskRouter(io) {
     ioMiddleware,
     taskController.deleteSubTask
   );
-  // router.get("/getAllOrders", ioMiddleware, queryController.getAllOrders);
+  router.get("/get-all-tasks", ioMiddleware, taskController.getAllTasks);
 
   return router;
 }
