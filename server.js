@@ -16,24 +16,24 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 const server = http.createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "*",
-    // origin: 'https://www.helpros.app/api/',
-    // methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    // credentials: true,
-  },
-});
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: "*",
+//     // origin: 'https://www.helpros.app/api/',
+//     // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     // credentials: true,
+//   },
+// });
 
-userRouterFile.userRouter(io);
-taskRouterFile.taskRouter(io);
+userRouterFile.userRouter();
+taskRouterFile.taskRouter();
 
-io.on("connection", (socket) => {
-  console.log("New client connected");
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
+// io.on("connection", (socket) => {
+//   console.log("New client connected");
+//   socket.on("disconnect", () => {
+//     console.log("Client disconnected");
+//   });
+// });
 
 const port = process.env.port || 6002;
 server.listen(port, () => {
