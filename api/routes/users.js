@@ -16,7 +16,11 @@ function userRouter(io) {
   router.post("/user-login", ioMiddleware, userController.userLogin);
   router.post("/user-signup", ioMiddleware, userController.addUser);
   router.get("/get-all-users", ioMiddleware, userController.getAllUsers);
-  router.get("/get-current-user/:id", ioMiddleware, userController.getAllUsers);
+  router.get(
+    "/get-current-user/:id",
+    ioMiddleware,
+    userController.getCurrentUser
+  );
 
   return router;
 }

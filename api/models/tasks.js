@@ -15,8 +15,8 @@ const taskSchema = mongoose.Schema(
       required: true,
     },
     status: {
-      type: String,
-      default: "incomplete",
+      type: Boolean,
+      default: false,
     },
     taskType: {
       type: String,

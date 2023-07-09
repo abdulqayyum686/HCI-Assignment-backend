@@ -5,7 +5,7 @@ module.exports.addMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
   const { taskName, belongsTo, taskType, status, version } = req.body;
 
-  Task.findOne({ taskName: taskName })
+  Task.findOne({ taskName: taskName, version })
     .exec()
     .then(async (foundObject) => {
       if (foundObject) {
@@ -35,6 +35,27 @@ module.exports.addMainTask = async (req, res, next) => {
             });
           });
       }
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        error: err,
+      });
+    });
+};
+module.exports.updateMainTask = async (req, res, next) => {
+  console.log("Add Task", req.body);
+  const { status } = req.body;
+
+  Task.findOneAndUpdate(
+    { _id: req.params.id },
+    { status: status },
+    { new: true }
+  )
+    .then(async (newDoc) => {
+      return res.status(201).json({
+        message: "Task Updated",
+        task: newDoc,
+      });
     })
     .catch((err) => {
       return res.status(500).json({
@@ -72,13 +93,15 @@ module.exports.addSubTask = (req, res, next) => {
           message: "Task do not exist",
         });
       } else {
+        let monoId = mongoose.Types.ObjectId().toString();
         Task.findByIdAndUpdate(
           { _id: taskId },
           {
             $push: {
               subTasks: {
                 ...taskObject,
-                _id: mongoose.Types.ObjectId(),
+                _id: monoId,
+                date: new Date(),
               },
             },
           },
@@ -108,12 +131,17 @@ module.exports.addSubTask = (req, res, next) => {
 module.exports.deleteSubTask = async (req, res, next) => {
   try {
     console.log("object", req.params);
+    let task = await Task.findOne({ _id: req.params.id });
+    let clone = [...task.subTasks];
+    let array = clone.filter(
+      (t) => t._id.toString() !== req.params.subTaskId.toString()
+    );
+    console.log("array", array);
+
     Task.findByIdAndUpdate(
       { _id: req.params.id },
       {
-        $pull: {
-          subTasks: { _id: mongoose.Types.ObjectId(req.params.subtaskId) },
-        },
+        subTasks: array,
       },
       { new: true }
     )
@@ -133,10 +161,76 @@ module.exports.deleteSubTask = async (req, res, next) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+module.exports.changeSubTaskStatus = async (req, res, next) => {
+  try {
+    const { id, subTaskId } = req.params;
+    const { status } = req.body;
+
+    const updatedDocument = await Task.findOneAndUpdate(
+      { _id: id },
+      { $set: { "subTasks.$[elem].status": status } },
+      { new: true, arrayFilters: [{ "elem._id": subTaskId }] }
+    );
+
+    if (updatedDocument) {
+      console.log("Document updated:", updatedDocument);
+      res.status(200).json({
+        message: "SubTask status updated successfully",
+        updatedDocument,
+      });
+    } else {
+      console.log("Task or subtask not found.");
+      res.status(404).json({ error: "Task or subtask not found" });
+    }
+  } catch (error) {
+    console.error("Error updating document:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+module.exports.changeSubTaskInputData = async (req, res, next) => {
+  try {
+    const { id, subTaskId } = req.params;
+    const { inputData } = req.body;
+
+    const updatedDocument = await Task.findOneAndUpdate(
+      { _id: id },
+      { $set: { "subTasks.$[elem].inputData": inputData } },
+      { new: true, arrayFilters: [{ "elem._id": subTaskId }] }
+    );
+
+    if (updatedDocument) {
+      console.log("Document updated:", updatedDocument);
+      res.status(200).json({
+        message: "SubTask status updated successfully",
+        updatedDocument,
+      });
+    } else {
+      console.log("Task or subtask not found.");
+      res.status(404).json({ error: "Task or subtask not found" });
+    }
+  } catch (error) {
+    console.error("Error updating document:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 module.exports.getAllTasks = async (req, res, next) => {
   try {
     let tasks = await Task.find().populate("belongsTo");
+    return res.status(201).json({
+      tasks,
+    });
+  } catch (error) {
+    return res.status(201).json({
+      error,
+    });
+  }
+};
+module.exports.getAllUserTasks = async (req, res, next) => {
+  try {
+    let tasks = await Task.find({ belongsTo: req.params.id }).populate(
+      "belongsTo"
+    );
     return res.status(201).json({
       tasks,
     });

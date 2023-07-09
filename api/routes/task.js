@@ -14,6 +14,9 @@ function taskRouter(io) {
   });
 
   router.post("/add-task", ioMiddleware, taskController.addMainTask);
+
+  router.put("/update-task/:id", ioMiddleware, taskController.updateMainTask);
+
   router.delete(
     "/delete-task/:id",
     ioMiddleware,
@@ -25,7 +28,22 @@ function taskRouter(io) {
     ioMiddleware,
     taskController.deleteSubTask
   );
+  router.put(
+    "/change-sub-task-status/:id/:subTaskId",
+    ioMiddleware,
+    taskController.changeSubTaskStatus
+  );
+  router.put(
+    "/change-sub-task-input-data/:id/:subTaskId",
+    ioMiddleware,
+    taskController.changeSubTaskInputData
+  );
   router.get("/get-all-tasks", ioMiddleware, taskController.getAllTasks);
+  router.get(
+    "/get-all-user-tasks/:id",
+    ioMiddleware,
+    taskController.getAllUserTasks
+  );
 
   return router;
 }
