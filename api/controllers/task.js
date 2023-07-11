@@ -164,11 +164,16 @@ module.exports.deleteSubTask = async (req, res, next) => {
 module.exports.changeSubTaskStatus = async (req, res, next) => {
   try {
     const { id, subTaskId } = req.params;
-    const { status } = req.body;
+    const { status, status2 } = req.body;
 
     const updatedDocument = await Task.findOneAndUpdate(
       { _id: id },
-      { $set: { "subTasks.$[elem].status": status } },
+      {
+        $set: {
+          "subTasks.$[elem].status": status,
+          "subTasks.$[elem].status2": status2,
+        },
+      },
       { new: true, arrayFilters: [{ "elem._id": subTaskId }] }
     );
 
@@ -191,6 +196,8 @@ module.exports.changeSubTaskInputData = async (req, res, next) => {
   try {
     const { id, subTaskId } = req.params;
     const { inputData } = req.body;
+
+    console.log("inputData===", inputData);
 
     const updatedDocument = await Task.findOneAndUpdate(
       { _id: id },
