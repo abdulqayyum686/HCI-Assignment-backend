@@ -18,9 +18,18 @@ const taskSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status2: {
+      type: Boolean,
+      default: false,
+    },
     taskType: {
       type: String,
-      default: "Academic",
+    },
+    completionDate: {
+      type: String,
+    },
+    diff: {
+      type: Number,
     },
     subTasks: {
       type: Array,

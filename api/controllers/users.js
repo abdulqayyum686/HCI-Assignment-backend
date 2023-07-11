@@ -46,12 +46,11 @@ module.exports.userLogin = (req, res, next) => {
       //     message: "invalid password",
       //   });
       // }
-
-      // } else {
-      //   return res.status(404).json({
-      //     message: "UserName Invalid",
-      //   });
-      // }
+      else {
+        return res.status(404).json({
+          message: "Invalid email",
+        });
+      }
     })
     .catch((err) => {
       return res.status(500).json({

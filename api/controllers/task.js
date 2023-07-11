@@ -3,52 +3,69 @@ const Task = require("../models/tasks");
 
 module.exports.addMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
-  const { taskName, belongsTo, taskType, status, version } = req.body;
+  const {
+    taskName,
+    belongsTo,
+    taskType,
+    status,
+    version,
+    completionDate,
+    diff,
+  } = req.body;
 
-  Task.findOne({ taskName: taskName, version })
-    .exec()
-    .then(async (foundObject) => {
-      if (foundObject) {
-        return res.status(403).json({
-          message: "Task Already exist",
-        });
-      } else {
-        let newTask = new Task({
-          taskName,
-          belongsTo,
-          taskType,
-          version,
-        });
-        newTask
-          .save()
-          .then(async (savedObject) => {
-            console.log("savedObject", savedObject);
-            return res.status(201).json({
-              message: "Task added",
-              task: savedObject,
-            });
-          })
-          .catch((err) => {
-            console.log("Not saved", err);
-            res.status(500).json({
-              error: err,
-            });
-          });
-      }
+  let newTask = new Task({
+    taskName,
+    belongsTo,
+    taskType,
+    version,
+    completionDate,
+    diff,
+  });
+  newTask
+    .save()
+    .then(async (savedObject) => {
+      console.log("savedObject", savedObject);
+      return res.status(201).json({
+        message: "Task added",
+        task: savedObject,
+      });
     })
     .catch((err) => {
-      return res.status(500).json({
+      console.log("Not saved", err);
+      res.status(500).json({
         error: err,
       });
     });
 };
 module.exports.updateMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
-  const { status } = req.body;
+  const { status, status2 } = req.body;
+  let task = await Task.findOne({ _id: req.params.id });
+  let array = [...task.subTasks];
+  if (status === true) {
+    array = array.map((t) => {
+      return {
+        ...t,
+        status: status,
+        // status2: status2,
+      };
+    });
+  }
 
+  if (status2 === true) {
+    array = array.map((t) => {
+      return {
+        ...t,
+        // status: status,
+        status2: status2,
+      };
+    });
+  }
+
+  console.log("ali raza====", array);
   Task.findOneAndUpdate(
     { _id: req.params.id },
-    { status: status },
+    { status: status, status2: status2, subTasks: array },
     { new: true }
   )
     .then(async (newDoc) => {
