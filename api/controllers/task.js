@@ -39,7 +39,9 @@ module.exports.addMainTask = async (req, res, next) => {
 };
 module.exports.updateMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
-  const { status, status2 } = req.body;
+  const { status, status2, inputData } = req.body;
+  console.log("inputData===", inputData);
+
   let task = await Task.findOne({ _id: req.params.id });
   let array = [...task.subTasks];
   if (status === true) {
@@ -65,7 +67,7 @@ module.exports.updateMainTask = async (req, res, next) => {
   console.log("ali raza====", array);
   Task.findOneAndUpdate(
     { _id: req.params.id },
-    { status: status, status2: status2, subTasks: array },
+    { status: status, status2: status2, subTasks: array, inputData: inputData },
     { new: true }
   )
     .then(async (newDoc) => {
@@ -218,7 +220,6 @@ module.exports.changeSubTaskInputData = async (req, res, next) => {
 
     const updatedDocument = await Task.findOneAndUpdate(
       { _id: id },
-      { $set: { "subTasks.$[elem].inputData": inputData } },
       { new: true, arrayFilters: [{ "elem._id": subTaskId }] }
     );
 

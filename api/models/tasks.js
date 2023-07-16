@@ -25,6 +25,9 @@ const taskSchema = mongoose.Schema(
     taskType: {
       type: String,
     },
+    inputData: {
+      type: String,
+    },
     completionDate: {
       type: String,
     },

@@ -21,6 +21,7 @@ function userRouter(io) {
 
     userController.getCurrentUser
   );
+  router.delete("/delete-user/:id", userController.deleteUser);
 
   return router;
 }

@@ -139,3 +139,20 @@ module.exports.getCurrentUser = async (req, res, next) => {
     });
   }
 };
+
+module.exports.deleteUser = async (req, res, next) => {
+  try {
+    const deletedDocument = await User.findByIdAndDelete(req.params.id);
+    if (deletedDocument) {
+      res.status(200).json({
+        message: "User deleted successfully",
+        deletedDocument,
+      });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (err) {
+    console.log("Error deleting task:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
