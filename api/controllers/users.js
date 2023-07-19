@@ -97,6 +97,7 @@ module.exports.addUser = (req, res, next) => {
             return res.status(201).json({
               message: "sign up successful",
               token: token,
+              user: savedObject,
             });
           })
           .catch((err) => {

@@ -72,7 +72,7 @@ module.exports.updateMainTask = async (req, res, next) => {
   )
     .then(async (newDoc) => {
       return res.status(201).json({
-        message: "Task Updated",
+        message: "Goal Updated",
         task: newDoc,
       });
     })
@@ -87,11 +87,11 @@ module.exports.deleteMainTask = async (req, res, next) => {
     const deletedDocument = await Task.findByIdAndDelete(req.params.id);
     if (deletedDocument) {
       res.status(200).json({
-        message: "Task deleted successfully",
+        message: "Goal deleted successfully",
         deletedDocument,
       });
     } else {
-      res.status(404).json({ error: "Task not found" });
+      res.status(404).json({ error: "Goal not found" });
     }
   } catch (err) {
     console.log("Error deleting task:", err);
@@ -109,7 +109,7 @@ module.exports.addSubTask = (req, res, next) => {
       console.log("task found", foundObject);
       if (!foundObject) {
         return res.status(403).json({
-          message: "Task do not exist",
+          message: "Goal do not exist",
         });
       } else {
         let monoId = mongoose.Types.ObjectId().toString();
@@ -129,7 +129,7 @@ module.exports.addSubTask = (req, res, next) => {
           .then((updatedDocument) => {
             console.log("Document updated:", updatedDocument);
             return res.status(201).json({
-              message: "Sub Task added",
+              message: "Sub-Goal added",
               subTask: updatedDocument,
             });
           })
@@ -167,7 +167,7 @@ module.exports.deleteSubTask = async (req, res, next) => {
       .then((updatedDocument) => {
         console.log("Document updated:", updatedDocument);
         res.status(200).json({
-          message: "SubTask deleted successfully",
+          message: "Sub-Goal deleted successfully",
           updatedDocument,
         });
       })
@@ -199,12 +199,12 @@ module.exports.changeSubTaskStatus = async (req, res, next) => {
     if (updatedDocument) {
       console.log("Document updated:", updatedDocument);
       res.status(200).json({
-        message: "SubTask status updated successfully",
+        message: "Sub-Goal status updated successfully",
         updatedDocument,
       });
     } else {
       console.log("Task or subtask not found.");
-      res.status(404).json({ error: "Task or subtask not found" });
+      res.status(404).json({ error: "Sub-Goal not found" });
     }
   } catch (error) {
     console.error("Error updating document:", error);
@@ -226,12 +226,12 @@ module.exports.changeSubTaskInputData = async (req, res, next) => {
     if (updatedDocument) {
       console.log("Document updated:", updatedDocument);
       res.status(200).json({
-        message: "SubTask status updated successfully",
+        message: "Sub-Goal status updated successfully",
         updatedDocument,
       });
     } else {
       console.log("Task or subtask not found.");
-      res.status(404).json({ error: "Task or subtask not found" });
+      res.status(404).json({ error: "SubGoal not found" });
     }
   } catch (error) {
     console.error("Error updating document:", error);
