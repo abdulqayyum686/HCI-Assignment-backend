@@ -1,5 +1,17 @@
 const http = require("http");
 const express = require("express");
+
+// const moment = require("moment");
+// require("moment-timezone");
+// const originalDate = new Date("2023-07-30T00:00:00.000Z"); // Replace this with your actual date
+// const timeZone = "America/Halifax"; // Replace with the desired time zone, e.g., 'America/Halifax'
+
+// // Apply the desired time zone to the date
+// const convertedDate = moment("2023-07-30T00:00:00.000Z").tz(timeZone);
+
+// console.log("Original Date:", originalDate.toString());
+// console.log("Converted Date:", convertedDate.format());
+
 // const app = express();
 require("events").EventEmitter.prototype._maxListeners = 100;
 const app = require("./app");

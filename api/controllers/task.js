@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Task = require("../models/tasks");
+const moment = require("moment");
+require("moment-timezone");
 
 module.exports.addMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
@@ -18,7 +20,7 @@ module.exports.addMainTask = async (req, res, next) => {
     belongsTo,
     taskType,
     version,
-    completionDate,
+    completionDate: moment(completionDate).tz("America/Halifax"),
     diff,
   });
   newTask
@@ -103,6 +105,10 @@ module.exports.addSubTask = (req, res, next) => {
   console.log("Add sub Task", req.body);
   const { taskId, taskObject } = req.body;
 
+  console.log(
+    "abdullllll===========",
+    moment(new Date(taskObject.completionDate)).tz("America/Halifax").format()
+  );
   Task.findOne({ _id: taskId.toString() })
     .exec()
     .then(async (foundObject) => {
@@ -121,6 +127,9 @@ module.exports.addSubTask = (req, res, next) => {
                 ...taskObject,
                 _id: monoId,
                 date: new Date(),
+                completionDate: moment(new Date(taskObject.completionDate))
+                  .tz("America/Halifax")
+                  .format(),
               },
             },
           },

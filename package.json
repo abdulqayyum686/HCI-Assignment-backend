@@ -7,7 +7,7 @@
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Muhammad Rehan Munir",
+  "author": "Abdul Qayyum",
   "license": "ISC",
   "dependencies": {
     "apple-signin-auth": "^1.5.1",
@@ -23,6 +23,8 @@
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.3",
     "mailgun-js": "^0.22.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "mongo-xlsx": "^1.0.12",
     "mongoose": "^5.10.5",
     "morgan": "^1.10.0",
