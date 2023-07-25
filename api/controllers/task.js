@@ -20,7 +20,7 @@ module.exports.addMainTask = async (req, res, next) => {
     belongsTo,
     taskType,
     version,
-    completionDate: moment(new Date(taskObject.completionDate))
+    completionDate: moment(new Date(completionDate))
       // .tz("America/Halifax")
       .add(1, "day")
       .format(),
