@@ -20,7 +20,10 @@ module.exports.addMainTask = async (req, res, next) => {
     belongsTo,
     taskType,
     version,
-    completionDate: moment(completionDate).tz("America/Halifax"),
+    completionDate: moment(new Date(taskObject.completionDate))
+      // .tz("America/Halifax")
+      .add(1, "day")
+      .format(),
     diff,
   });
   newTask
@@ -128,7 +131,8 @@ module.exports.addSubTask = (req, res, next) => {
                 _id: monoId,
                 date: new Date(),
                 completionDate: moment(new Date(taskObject.completionDate))
-                  .tz("America/Halifax")
+                  // .tz("America/Halifax")
+                  .add(1, "day")
                   .format(),
               },
             },
