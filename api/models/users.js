@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: "user",
     },
+    loginCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

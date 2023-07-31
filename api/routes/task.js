@@ -14,6 +14,7 @@ function taskRouter(io) {
   // });
 
   router.post("/add-task", taskController.addMainTask);
+  // router.post("/add-activity", taskController.addActivity);
 
   router.put("/update-task/:id", taskController.updateMainTask);
 
@@ -39,6 +40,7 @@ function taskRouter(io) {
     taskController.changeSubTaskInputData
   );
   router.get("/get-all-tasks", taskController.getAllTasks);
+  router.get("/get-all-activity", taskController.getAllActivity);
   router.get(
     "/get-all-user-tasks/:id",
 

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Task = require("../models/tasks");
+const Activity = require("../models/activity");
 const moment = require("moment");
 require("moment-timezone");
 
@@ -42,13 +43,31 @@ module.exports.addMainTask = async (req, res, next) => {
       });
     });
 };
+// module.exports.addActivity = async (req, res, next) => {
+//   let activity = new Activity({ ...req.body });
+//   activity
+//     .save()
+//     .then(async (savedObject) => {
+//       console.log("savedObject", savedObject);
+//       return res.status(201).json({
+//         message: "Activity added",
+//         activity: savedObject,
+//       });
+//     })
+//     .catch((err) => {
+//       console.log("Not saved", err);
+//       res.status(500).json({
+//         error: err,
+//       });
+//     });
+// };
 module.exports.updateMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
-  const { status, status2, inputData } = req.body;
-  console.log("inputData===", inputData);
+  const { status, status2, inputData, subTasks } = req.body;
+  console.log("inputData===", subTasks);
 
   let task = await Task.findOne({ _id: req.params.id });
-  let array = [...task.subTasks];
+  let array = req.body.subTasks ? req.body.subTasks : [...task.subTasks];
   if (status === true) {
     array = array.map((t) => {
       return {
@@ -72,10 +91,17 @@ module.exports.updateMainTask = async (req, res, next) => {
   console.log("ali raza====", array);
   Task.findOneAndUpdate(
     { _id: req.params.id },
-    { status: status, status2: status2, subTasks: array, inputData: inputData },
+    {
+      ...req.body,
+      // status: status,
+      // status2: status2,
+      subTasks: array,
+      // inputData: inputData,
+    },
     { new: true }
   )
     .then(async (newDoc) => {
+      AddActivity(req, res, next, newDoc, req.body.type);
       return res.status(201).json({
         message: "Goal Updated",
         task: newDoc,
@@ -93,7 +119,7 @@ module.exports.deleteMainTask = async (req, res, next) => {
     if (deletedDocument) {
       res.status(200).json({
         message: "Goal deleted successfully",
-        deletedDocument,
+        task: deletedDocument,
       });
     } else {
       res.status(404).json({ error: "Goal not found" });
@@ -196,7 +222,7 @@ module.exports.deleteSubTask = async (req, res, next) => {
 module.exports.changeSubTaskStatus = async (req, res, next) => {
   try {
     const { id, subTaskId } = req.params;
-    const { status, status2 } = req.body;
+    const { status, status2, type } = req.body;
 
     const updatedDocument = await Task.findOneAndUpdate(
       { _id: id },
@@ -210,6 +236,7 @@ module.exports.changeSubTaskStatus = async (req, res, next) => {
     );
 
     if (updatedDocument) {
+      AddActivity(req, res, next, updatedDocument, type);
       console.log("Document updated:", updatedDocument);
       res.status(200).json({
         message: "Sub-Goal status updated successfully",
@@ -264,11 +291,36 @@ module.exports.getAllTasks = async (req, res, next) => {
     });
   }
 };
+module.exports.getAllActivity = async (req, res, next) => {
+  try {
+    let activity = await Activity.find();
+    let array = [...activity];
+    for (let i = 0; i < array.length; i++) {
+      array[i] = { ...array[i].activity, actionType: array[i].type };
+      delete array[i].activity;
+    }
+    // console.log("array========================", array);
+    return res.status(201).json({
+      activity: array,
+    });
+  } catch (error) {
+    return res.status(201).json({
+      error,
+    });
+  }
+};
 module.exports.getAllUserTasks = async (req, res, next) => {
   try {
-    let tasks = await Task.find({ belongsTo: req.params.id }).populate(
-      "belongsTo"
-    );
+    let tasks = await Task.find({
+      belongsTo: req.params.id,
+      isDeleted: false,
+    })
+      .populate("belongsTo")
+      .lean();
+    tasks = tasks.map((task) => ({
+      ...task,
+      subTasks: task.subTasks.filter((subTask) => subTask.isDeleted === false),
+    }));
     return res.status(201).json({
       tasks,
     });
@@ -277,4 +329,23 @@ module.exports.getAllUserTasks = async (req, res, next) => {
       error,
     });
   }
+};
+
+const AddActivity = (req, res, next, data, type) => {
+  console.log(
+    "ali raza========================================================================================================================",
+    data,
+    type
+  );
+  let activity = new Activity({ activity: data, type });
+
+  activity
+    .save()
+    .then(async (savedObject) => {
+      console.log("savedObject", savedObject);
+    })
+    .catch((err) => {
+      console.log("Not saved", err);
+    });
+  next();
 };

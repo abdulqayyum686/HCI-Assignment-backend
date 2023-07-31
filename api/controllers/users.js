@@ -15,38 +15,23 @@ module.exports.userLogin = (req, res, next) => {
         const token = jwt.sign({ ...foundObject.toObject() }, "secret", {
           expiresIn: "5d",
         });
-
-        return res.status(200).json({
-          token: token,
-          user: foundObject,
-        });
-      }
-      // await bcrypt.compare(
-      //   password,
-      //   foundObject.password,
-      //   async (err, newResult) => {
-      //     if (err) {
-      //       return res.status(501).json({ error, err });
-      //     } else {
-      // if (newResult) {
-      // const token = jwt.sign(
-      //   { ...foundObject.toObject() },
-      //   "secret",
-      //   {
-      //     expiresIn: "5d",
-      //   }
-      // );
-
-      // return res.status(200).json({
-      //   token: token,
-      //   user: foundObject,
-      // });
-      // } else {
-      //   return res.status(401).json({
-      //     message: "invalid password",
-      //   });
-      // }
-      else {
+        await User.findOneAndUpdate(
+          { email: email, version },
+          { $inc: { loginCount: 1 } },
+          { new: true }
+        )
+          .then((user) => {
+            return res.status(200).json({
+              token: token,
+              user: user,
+            });
+          })
+          .catch((err) => {
+            return res.status(500).json({
+              message: "Invalid email",
+            });
+          });
+      } else {
         return res.status(404).json({
           message: "Invalid email",
         });
@@ -118,7 +103,7 @@ module.exports.addUser = (req, res, next) => {
 };
 module.exports.getAllUsers = async (req, res, next) => {
   try {
-    let users = await User.find();
+    let users = await User.find({ type: "user" });
     return res.status(201).json({
       users,
     });

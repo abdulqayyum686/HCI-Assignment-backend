@@ -27,12 +27,17 @@ const taskSchema = mongoose.Schema(
     },
     inputData: {
       type: String,
+      default: "",
     },
     completionDate: {
       type: String,
     },
     diff: {
       type: Number,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
     subTasks: {
       type: Array,
