@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const Task = require("../models/tasks");
-const Activity = require("../models/activity");
 const moment = require("moment");
+const Activity = require("../models/activity");
+const User = require("../models/users");
 require("moment-timezone");
 
 module.exports.addMainTask = async (req, res, next) => {
@@ -67,6 +68,7 @@ module.exports.updateMainTask = async (req, res, next) => {
   console.log("inputData===", subTasks);
 
   let task = await Task.findOne({ _id: req.params.id });
+
   let array = req.body.subTasks ? req.body.subTasks : [...task.subTasks];
   if (status === true) {
     array = array.map((t) => {
@@ -97,6 +99,10 @@ module.exports.updateMainTask = async (req, res, next) => {
       // status2: status2,
       subTasks: array,
       // inputData: inputData,
+      completionDate: moment(new Date(req.body.completionDate))
+        // .tz("America/Halifax")
+        .add(1, "day")
+        .format(),
     },
     { new: true }
   )
@@ -296,7 +302,11 @@ module.exports.getAllActivity = async (req, res, next) => {
     let activity = await Activity.find();
     let array = [...activity];
     for (let i = 0; i < array.length; i++) {
-      array[i] = { ...array[i].activity, actionType: array[i].type };
+      array[i] = {
+        ...array[i].activity,
+        belongsTo: { ...array[i].belongsTo },
+        actionType: array[i].type,
+      };
       delete array[i].activity;
     }
     // console.log("array========================", array);
@@ -331,13 +341,13 @@ module.exports.getAllUserTasks = async (req, res, next) => {
   }
 };
 
-const AddActivity = (req, res, next, data, type) => {
-  console.log(
-    "ali raza========================================================================================================================",
-    data,
-    type
-  );
-  let activity = new Activity({ activity: data, type });
+const AddActivity = async (req, res, next, data, type) => {
+  let user = await User.findOne({ _id: data.belongsTo });
+  // console.log(
+  //   "ali raza========================================================================================================================",
+  //   user
+  // );
+  let activity = new Activity({ activity: data, type, belongsTo: user });
 
   activity
     .save()

@@ -10,6 +10,10 @@ const activitySchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    belongsTo: {
+      type: Object,
+      required: true,
+    },
   },
   {
     timestamps: true,
