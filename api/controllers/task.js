@@ -89,20 +89,22 @@ module.exports.updateMainTask = async (req, res, next) => {
       };
     });
   }
-
+  let obj = { ...req.body };
+  if (req.body.completionDate) {
+    obj.completionDate = moment(new Date(req.body.completionDate))
+      // .tz("America/Halifax")
+      .add(1, "day")
+      .format();
+  }
   console.log("ali raza====", array);
   Task.findOneAndUpdate(
     { _id: req.params.id },
     {
-      ...req.body,
+      ...obj,
       // status: status,
       // status2: status2,
       subTasks: array,
       // inputData: inputData,
-      completionDate: moment(new Date(req.body.completionDate))
-        // .tz("America/Halifax")
-        .add(1, "day")
-        .format(),
     },
     { new: true }
   )
