@@ -355,9 +355,9 @@ const AddActivity = async (req, res, next, data, type) => {
     .save()
     .then(async (savedObject) => {
       console.log("savedObject", savedObject);
+      // next();
     })
     .catch((err) => {
       console.log("Not saved", err);
     });
-  next();
 };
