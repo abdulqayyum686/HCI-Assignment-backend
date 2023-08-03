@@ -110,7 +110,7 @@ module.exports.updateMainTask = async (req, res, next) => {
     { new: true }
   )
     .then(async (newDoc) => {
-      AddActivity(req, res, next, newDoc, req.body.type);
+      AddActivity(req, res, next, newDoc, req.body.type, req.body.type2);
       return res.status(201).json({
         message: "Goal Updated",
         task: newDoc,
@@ -231,7 +231,7 @@ module.exports.deleteSubTask = async (req, res, next) => {
 module.exports.changeSubTaskStatus = async (req, res, next) => {
   try {
     const { id, subTaskId } = req.params;
-    const { status, status2, type } = req.body;
+    const { status, status2, type, type2 } = req.body;
 
     const updatedDocument = await Task.findOneAndUpdate(
       { _id: id },
@@ -245,7 +245,7 @@ module.exports.changeSubTaskStatus = async (req, res, next) => {
     );
 
     if (updatedDocument) {
-      AddActivity(req, res, next, updatedDocument, type);
+      AddActivity(req, res, next, updatedDocument, type, type2);
       console.log("Document updated:", updatedDocument);
       res.status(200).json({
         message: "Sub-Goal status updated successfully",
@@ -304,13 +304,14 @@ module.exports.getAllActivity = async (req, res, next) => {
   try {
     let activity = await Activity.find();
     let array = [...activity];
-    array = _.sortBy(array, "type");
+    // array = _.sortBy(array, "type");
     console.log("sor array===", array);
     for (let i = 0; i < array.length; i++) {
       array[i] = {
         ...array[i].activity,
         belongsTo: { ...array[i].belongsTo },
         actionType: array[i].type,
+        type2: array[i].type2,
         // timeStamps: array[i].updatedAt,
       };
       delete array[i].activity;
@@ -348,13 +349,13 @@ module.exports.getAllUserTasks = async (req, res, next) => {
   }
 };
 
-const AddActivity = async (req, res, next, data, type) => {
+const AddActivity = async (req, res, next, data, type, type2) => {
   let user = await User.findOne({ _id: data.belongsTo });
   // console.log(
   //   "ali raza========================================================================================================================",
   //   user
   // );
-  let activity = new Activity({ activity: data, type, belongsTo: user });
+  let activity = new Activity({ activity: data, type, type2, belongsTo: user });
 
   activity
     .save()
