@@ -4,6 +4,7 @@ const moment = require("moment");
 const Activity = require("../models/activity");
 const User = require("../models/users");
 require("moment-timezone");
+const _ = require("lodash");
 
 module.exports.addMainTask = async (req, res, next) => {
   console.log("Add Task", req.body);
@@ -303,15 +304,19 @@ module.exports.getAllActivity = async (req, res, next) => {
   try {
     let activity = await Activity.find();
     let array = [...activity];
+    array = _.sortBy(array, "type");
+    console.log("sor array===", array);
     for (let i = 0; i < array.length; i++) {
       array[i] = {
         ...array[i].activity,
         belongsTo: { ...array[i].belongsTo },
         actionType: array[i].type,
+        // timeStamps: array[i].updatedAt,
       };
       delete array[i].activity;
     }
     // console.log("array========================", array);
+
     return res.status(201).json({
       activity: array,
     });
