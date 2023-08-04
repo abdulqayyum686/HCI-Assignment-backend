@@ -242,11 +242,17 @@ module.exports.changeSubTaskStatus = async (req, res, next) => {
         },
       },
       { new: true, arrayFilters: [{ "elem._id": subTaskId }] }
-    );
-
+    ).lean();
     if (updatedDocument) {
-      AddActivity(req, res, next, updatedDocument, type, type2);
-      console.log("Document updated:", updatedDocument);
+      let doc = { ...updatedDocument };
+      let array = [...updatedDocument.subTasks].filter(
+        (f) => f._id === subTaskId
+      );
+
+      doc.subTasks = array;
+      // console.log("viru=====", array, doc);
+      AddActivity(req, res, next, doc, type, type2);
+      // console.log("Document updated:", updatedDocument);
       res.status(200).json({
         message: "Sub-Goal status updated successfully",
         updatedDocument,

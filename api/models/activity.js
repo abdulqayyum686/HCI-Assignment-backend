@@ -12,7 +12,7 @@ const activitySchema = mongoose.Schema(
     },
     type2: {
       type: String,
-      required: true,
+      default: null,
     },
     belongsTo: {
       type: Object,
