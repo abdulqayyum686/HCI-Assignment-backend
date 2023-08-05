@@ -204,25 +204,32 @@ module.exports.deleteSubTask = async (req, res, next) => {
   try {
     console.log("object", req.params);
     let task = await Task.findOne({ _id: req.params.id });
+    let indexData = { ...task };
     let clone = [...task.subTasks];
+
+    let subIndex = clone.findIndex((sm) => sm._id === req.params.subTaskId);
+    // console.log("comsat lahore===222", mainIndex, subIndex);
+    clone[subIndex] = {
+      ...clone[subIndex],
+      isDeleted: true,
+    };
+    indexData.subTasks = clone;
+
     let deletedDoc = clone.filter(
       (t) => t._id.toString() === req.params.subTaskId.toString()
     );
-    let array = clone.filter(
-      (t) => t._id.toString() !== req.params.subTaskId.toString()
-    );
-    console.log("array", array);
+    console.log("array", clone);
 
     Task.findByIdAndUpdate(
       { _id: req.params.id },
       {
-        subTasks: array,
+        subTasks: clone,
       },
       { new: true }
     )
       .then((updatedDocument) => {
         let doc = { ...updatedDocument.toObject() };
-        doc.subTasks = deletedDoc;
+        doc.subTasks = deletedDoc.map((obj) => ({ ...obj, isDeleted: true }));
         AddActivity(req, res, next, doc, "deleteSubTask", null);
         console.log("Document updated:", doc);
         res.status(200).json({
