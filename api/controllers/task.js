@@ -64,8 +64,9 @@ module.exports.addMainTask = async (req, res, next) => {
 //     });
 // };
 module.exports.updateMainTask = async (req, res, next) => {
-  console.log("Add Task", req.body);
-  const { status, status2, inputData, subTasks } = req.body;
+  console.log("updatedSubTask", req.body.updatedSubTask);
+  const { status, status2, inputData, subTasks, type, updatedSubTask } =
+    req.body;
   console.log("inputData===", subTasks);
 
   let task = await Task.findOne({ _id: req.params.id });
@@ -110,7 +111,11 @@ module.exports.updateMainTask = async (req, res, next) => {
     { new: true }
   )
     .then(async (newDoc) => {
-      AddActivity(req, res, next, newDoc, req.body.type, req.body.type2);
+      let doc = { ...newDoc.toObject() };
+      if (type === "updateSubTask") {
+        doc.subTasks = updatedSubTask;
+      }
+      AddActivity(req, res, next, doc, req.body.type, req.body.type2);
       return res.status(201).json({
         message: "Goal Updated",
         task: newDoc,
@@ -200,6 +205,9 @@ module.exports.deleteSubTask = async (req, res, next) => {
     console.log("object", req.params);
     let task = await Task.findOne({ _id: req.params.id });
     let clone = [...task.subTasks];
+    let deletedDoc = clone.filter(
+      (t) => t._id.toString() === req.params.subTaskId.toString()
+    );
     let array = clone.filter(
       (t) => t._id.toString() !== req.params.subTaskId.toString()
     );
@@ -213,7 +221,10 @@ module.exports.deleteSubTask = async (req, res, next) => {
       { new: true }
     )
       .then((updatedDocument) => {
-        console.log("Document updated:", updatedDocument);
+        let doc = { ...updatedDocument.toObject() };
+        doc.subTasks = deletedDoc;
+        AddActivity(req, res, next, doc, "deleteSubTask", null);
+        console.log("Document updated:", doc);
         res.status(200).json({
           message: "Sub-Goal deleted successfully",
           updatedDocument,
